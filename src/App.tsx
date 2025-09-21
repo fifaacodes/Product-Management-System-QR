@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthWrapper } from './components/AuthWrapper';
 import { TopNavigation } from './components/TopNavigation';
 import { Dashboard } from './components/Dashboard';
 import { FileUpload } from './components/FileUpload';
@@ -60,23 +61,27 @@ function HomePage() {
 function App() {
   const [allProducts, setAllProducts] = useState<ProductData[]>([]);
 
-  // Load all products from all files for the product view
+  const renderCurrentView = (user: any) => {
   React.useEffect(() => {
-    const files = getFileEntries();
-    const products = files.flatMap(file => file.data);
-    setAllProducts(products);
-  }, []);
-
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route 
-          path="/product/:id" 
-          element={<ProductView products={allProducts} />} 
-        />
-      </Routes>
-    </Router>
+    <AuthWrapper>
+      {(user) => (
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <Routes>
+              <Route path="/product/:fileId/:productIndex" element={<ProductView />} />
+              <Route path="*" element={
+                <>
+                  <TopNavigation currentView={currentView} onViewChange={setCurrentView} />
+                  <main className="pt-16">
+                    {renderCurrentView(user)}
+                  </main>
+                </>
+              } />
+            </Routes>
+          </div>
+        </Router>
+      )}
+    </AuthWrapper>
   );
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Package, Calendar, Tag } from 'lucide-react';
-import { ProductData } from '../types';
+import { SupabaseStorage } from '../utils/supabaseStorage';
 
 interface ProductViewProps {
   products: ProductData[];
@@ -14,7 +14,7 @@ export const ProductView: React.FC<ProductViewProps> = ({ products }) => {
   useEffect(() => {
     if (id && products.length > 0) {
       const foundProduct = products.find(p => p.id === id);
-      setProduct(foundProduct || null);
+        const file = await SupabaseStorage.getFile(fileId);
     }
   }, [id, products]);
 
@@ -32,6 +32,9 @@ export const ProductView: React.FC<ProductViewProps> = ({ products }) => {
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Home</span>
           </Link>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading product details...</p>
         </div>
       </div>
     );
