@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Upload, FileText, AlertCircle, ArrowLeft } from 'lucide-react';
 import { FileEntry } from '../types';
-import { saveFileEntry } from '../utils/storage';
+import { SupabaseStorage } from '../utils/supabaseStorage';
 import { parseExcelFile } from '../utils/excelParser';
 import { ProductData } from '../types';
 
@@ -69,21 +69,21 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onBack, onSuccess }) => 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       if (validateFile(file)) {
-        handleFileProcess(file);
+        handleFileProcess(file, fileName);
       }
     }
-  }, []);
+  }, [fileName]);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (validateFile(file)) {
-        handleFileProcess(file);
+        handleFileProcess(file, fileName);
       }
     }
   };
 
-  const handleFileProcess = async (file: File) => {
+  const handleFileProcess = async (file: File, customName?: string) => {
     setIsLoading(true);
     setError(null);
     
@@ -102,8 +102,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onBack, onSuccess }) => 
       
       // Create file entry
       const fileEntry: FileEntry = {
-        id: `file-${Date.now()}`,
-        name: fileName.trim() || file.name.replace(/\.[^/.]+$/, ''),
+        id: '', // Will be set by Supabase
+        name: customName || file.name.replace(/\.[^/.]+$/, ''), // Remove extension
         type: 'excel',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -111,7 +111,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onBack, onSuccess }) => 
         versions: []
       };
       
-      saveFileEntry(fileEntry);
+      await SupabaseStorage.saveFile(fileEntry);
       onSuccess();
     } catch (err) {
       console.error('Error processing file:', err);
@@ -179,7 +179,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onBack, onSuccess }) => 
           
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {isLoading ? 'Processing your file...' : 'Upload Excel File'}
+              {isLoading ? 'Processing and saving...' : 'Upload Excel File'}
             </h3>
             <p className="text-sm text-gray-600">
               Drag and drop your Excel file here, or click to browse
