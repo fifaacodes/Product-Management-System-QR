@@ -14,7 +14,7 @@ export const ProductView: React.FC<ProductViewProps> = ({ products }) => {
   useEffect(() => {
     if (id && products.length > 0) {
       const foundProduct = products.find(p => p.id === id);
-        const file = await SupabaseStorage.getFile(fileId);
+      setProduct(foundProduct || null);
     }
   }, [id, products]);
 
@@ -32,6 +32,7 @@ export const ProductView: React.FC<ProductViewProps> = ({ products }) => {
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Home</span>
           </Link>
+        </div>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading product details...</p>
