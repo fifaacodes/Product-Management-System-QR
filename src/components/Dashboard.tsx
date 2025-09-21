@@ -3,6 +3,7 @@ import { FileText, Calendar, Eye, Edit, Trash2, Download, Plus, Clock } from 'lu
 import type { ProductFile, ProductData } from '../types';
 import { SupabaseStorage } from '../utils/supabaseStorage';
 import { ProductTable } from './ProductTable';
+import { generatePDF } from '../utils/pdfGenerator';
 import type { User } from '@supabase/supabase-js';
 
 interface DashboardProps {
@@ -46,6 +47,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleDownloadPDF = (file: ProductFile) => {
+    const qrCodes = file.data.map(product => ({
+      id: product.id || '',
+      name: product.name || '',
+      price: product.price || 0
+    }));
+    const codesPerPage = 12;
+    generatePDF(file.data, qrCodes, codesPerPage);
   };
 
   const handleShowVersions = async (fileId: string) => {
@@ -211,6 +222,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                   >
                     <Eye className="w-4 h-4" />
                     View
+                  </button>
+                  <button
+                    onClick={() => handleDownloadPDF(file)}
+                    className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
                   </button>
                   <button
                     onClick={() => handleShowVersions(file.id)}
