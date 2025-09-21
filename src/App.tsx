@@ -60,9 +60,16 @@ function HomePage() {
 
 function App() {
   const [allProducts, setAllProducts] = useState<ProductData[]>([]);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'excel' | 'raw'>('dashboard');
 
   const renderCurrentView = (user: any) => {
+    return <HomePage />;
+  };
+
   React.useEffect(() => {
+  }, []);
+
+  return (
     <AuthWrapper>
       {(user) => (
         <Router>
